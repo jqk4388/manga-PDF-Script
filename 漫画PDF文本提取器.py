@@ -3,24 +3,30 @@ from tkinter import filedialog
 import extracted_PDF_JPtext
 import os
 
-# 声明 file_path 为全局变量（初始化为空）
-file_path = ""
+# 声明 file_paths 为全局变量（初始化为空列表）
+file_paths = []
 
-def open_pdf():
-    global file_path
-    file_path = filedialog.askopenfilename(filetypes=[("PDF files", "*.pdf")])
-    if file_path:
-        file_name = os.path.basename(file_path)
-        print(f"Selected PDF: {file_path}")
-        label.config(text=f"当前打开：{file_name}")  # 更新标签文本
+def open_pdfs():
+    global file_paths
+    file_paths = filedialog.askopenfilenames(filetypes=[("PDF files", "*.pdf")])
+    if file_paths:
+        file_names = [os.path.basename(path) for path in file_paths]
+        short_names = [name[:3] + "..." if len(name) > 3 else name for name in file_names]
+        # 每行显示最多4个文件名，自动换行
+        lines = []
+        for i in range(0, len(short_names), 4):
+            lines.append(", ".join(short_names[i:i+4]))
+        label.config(text="当前打开：\n" + "\n".join(lines))
+        print(f"Selected PDFs: {file_paths}")
 
 def extract_pdf():
-    if file_path:
-        print(f"Extracting from PDF: {file_path}")
-        print(f"Text Size: {text_size_var.get()}")
-        print(f"X Offset: {x_offset_var.get()}")
-        print(f"Y Offset: {y_offset_var.get()}")
-        extracted_PDF_JPtext.main(export_lptxt_var, pagekuaye, file_path, text_size_var, x_offset_var, y_offset_var)
+    if file_paths:
+        for path in file_paths:
+            print(f"Extracting from PDF: {path}")
+            print(f"Text Size: {text_size_var.get()}")
+            print(f"X Offset: {x_offset_var.get()}")
+            print(f"Y Offset: {y_offset_var.get()}")
+            extracted_PDF_JPtext.main(export_lptxt_var, pagekuaye, path, text_size_var, x_offset_var, y_offset_var)
     else:
         print("No PDF selected!")
 
@@ -76,7 +82,7 @@ label = tk.Label(root, justify="left")
 label.grid(row=0, column=1, sticky="ew")  # 使用 pack() 方法将标签放置在窗口中
 
 # 文件选择按钮
-open_pdf_button = tk.Button(root, text="打开一个PDF", command=open_pdf)
+open_pdf_button = tk.Button(root, text="打开PDF文件（可多选）", command=open_pdfs)
 open_pdf_button.grid(row=0, column=0, padx=10, pady=10)
 
 # 滑块1和文本框：筛选过滤文字大小
