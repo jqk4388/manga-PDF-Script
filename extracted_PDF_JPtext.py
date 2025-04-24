@@ -51,7 +51,7 @@ def extract_readtext_from_pdf(pagekuaye, file_path, rubi_size, x_position_thresh
                     
                     for char in char_data:
                         # 如果字体大小大于某个值，且不是【A-OTF リュウミン Pr6N B-KL】字体（假名），则保留
-                        if char["size"] > rubi_size and char["fontname"] != "A-OTF リュウミン Pr6N B-KL" and char["fontname"] != "RyuminPr6N-Bold":
+                        if char["size"] > rubi_size and char["fontname"] not in {"A-OTF リュウミン Pr6N B-KL", "RyuminPr6N-Bold"}:
                             if prev_char is not None and is_new_block(prev_char, char, x_position_threshold, y_position_threshold):
                                 # 如果是新块，把前一个块加入到页文本中，并开始新的块
                                 page_text.append(''.join(block_text) + '\n')
@@ -113,7 +113,7 @@ def extract_lptext_from_pdf(pagekuaye, file_path, rubi_size, x_position_threshol
                     
                     for char in char_data:
                         # 如果字体大小大于某个值，且不是【A-OTF リュウミン Pr6N B-KL】字体（假名），则保留
-                        if char["size"] > rubi_size and char["fontname"] != "A-OTF リュウミン Pr6N B-KL" and char["fontname"] != "RyuminPr6N-Bold":
+                        if char["size"] > rubi_size and char["fontname"] not in {"A-OTF リュウミン Pr6N B-KL", "RyuminPr6N-Bold"}:
                             if prev_char is not None and is_new_block(prev_char, char, x_position_threshold, y_position_threshold):
                                 page_text.append(f"----------------[{idx+1}]----------------[{first_char['x0']/page_width},{1 - first_char['y0']/page_height},1]\n")
                                 # 如果是新块，把前一个块加入到页文本中，并开始新的块
