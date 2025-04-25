@@ -3,13 +3,13 @@
 
     pip install pdfplumber
 
-![日文漫画PDF文字提取器](img\QQ20250426-030756.png)
+![日文漫画PDF文字提取器](img/QQ20250426-030756.png)
 
 **PDF自动生成注释** 把PDF中的原文右上角添加注释，显示字体字号信息。
 
     pip install pdfplumber pymupdf
 
-![PDF自动生成注释](img\QQ20250426-031013.png)
+![PDF自动生成注释](img/QQ20250426-031013.png)
 
 **PDF注释导出：** Acrobat导出PDF注释内容，加粗部分用【】括号包裹。
 
@@ -17,7 +17,7 @@
 
 ## 安装方法
 
-![安装方法](img\QQ20250426-031130.png)
+![安装方法](img/QQ20250426-031130.png)
 
 1. Adobe Acrobat Pro
 - 更多工具中找到指引式操作（旧版本叫动作向导）
