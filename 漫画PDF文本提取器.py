@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 import extracted_PDF_JPtext
 import os
+import threading
 
 # 声明 file_paths 为全局变量（初始化为空列表）
 file_paths = []
@@ -11,24 +12,37 @@ def open_pdfs():
     file_paths = filedialog.askopenfilenames(filetypes=[("PDF files", "*.pdf")])
     if file_paths:
         file_names = [os.path.basename(path) for path in file_paths]
-        short_names = [name[:3] + "..." if len(name) > 3 else name for name in file_names]
-        # 每行显示最多4个文件名，自动换行
+        short_names = [name[:5] + "..." if len(name) > 5 else name for name in file_names]
+        # 每行显示最多5个文件名，自动换行
         lines = []
-        for i in range(0, len(short_names), 4):
-            lines.append(", ".join(short_names[i:i+4]))
+        for i in range(0, len(short_names), 5):
+            lines.append(", ".join(short_names[i:i+5]))
         label.config(text="当前打开：\n" + "\n".join(lines))
         print(f"Selected PDFs: {file_paths}")
 
+def extract_worker(pdf_list):
+    for path in pdf_list:
+        print(f"Extracting from PDF: {path}")
+        print(f"Text Size: {text_size_var.get()}")
+        print(f"X Offset: {x_offset_var.get()}")
+        print(f"Y Offset: {y_offset_var.get()}")
+        extracted_PDF_JPtext.main(export_lptxt_var, export_blank_lptxt_var, pagekuaye, path, text_size_var, x_offset_var, y_offset_var)
+
 def extract_pdf():
     if file_paths:
-        for path in file_paths:
-            print(f"Extracting from PDF: {path}")
-            print(f"Text Size: {text_size_var.get()}")
-            print(f"X Offset: {x_offset_var.get()}")
-            print(f"Y Offset: {y_offset_var.get()}")
-            extracted_PDF_JPtext.main(export_lptxt_var, pagekuaye, path, text_size_var, x_offset_var, y_offset_var)
+        # 交错分割PDF列表，分成3组，分别给线程1、2、3
+        n = 3
+        pdf_lists = [[] for _ in range(n)]
+        for idx, path in enumerate(file_paths):
+            pdf_lists[idx % n].append(path)
+        threads = []
+        for pdf_list in pdf_lists:
+            if pdf_list:  # 跳过空组
+                t = threading.Thread(target=extract_worker, args=(pdf_list,))
+                t.start()
+                threads.append(t)
     else:
-        print("No PDF selected!")
+        print("没有选择PDF！")
 
 # 更新滑块和文本框的联动功能
 def update_text_size_slider(val):
@@ -61,25 +75,26 @@ def update_page():
 # 创建主窗口
 root = tk.Tk()
 root.title("漫画PDF文本提取器")
-# 设置窗口大小
-window_width = 450
-window_height = 250
-root.geometry(f"{window_width}x{window_height}")
+root.resizable(True, True)  # 允许用户手动调整窗口大小
 
-# 计算屏幕居中位置
+# 启动时居中窗口
+root.update_idletasks()
+win_width = root.winfo_reqwidth()
+win_height = root.winfo_reqheight()
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
-x = (screen_width - window_width) // 2
-y = (screen_height - window_height) // 2
-root.geometry(f"{window_width}x{window_height}+{x}+{y}")  # 设置窗口位置
+x = (screen_width - win_width) // 2
+y = (screen_height - win_height) // 2
+root.geometry(f"+{x}+{y}")
+
 # 定义一个变量来保存page的值
 pagekuaye = tk.IntVar(value=2)
 # 定义一个保存勾选状态的变量
 checkbox_var = tk.IntVar(value=1)
 
 # 创建标签并将文本添加到标签中
-label = tk.Label(root, justify="left")
-label.grid(row=0, column=1, sticky="ew")  # 使用 pack() 方法将标签放置在窗口中
+label = tk.Label(root, justify="left", anchor="w", wraplength=450)
+label.grid(row=0, column=1, sticky="ew")
 
 # 文件选择按钮
 open_pdf_button = tk.Button(root, text="打开PDF文件（可多选）", command=open_pdfs)
@@ -129,12 +144,28 @@ checkbox = tk.Checkbutton(root, text="是否跨页", variable=checkbox_var, comm
 checkbox.grid(row=4, column=0)
 
 # 创建“是否导出lptxt”勾选框，放在“是否跨页”右边
-export_lptxt_checkbox = tk.Checkbutton(root, text="是否导出lptxt", variable=export_lptxt_var)
+export_lptxt_checkbox = tk.Checkbutton(root, text="导出lptxt", variable=export_lptxt_var)
 export_lptxt_checkbox.grid(row=4, column=1, sticky='w')
+# 定义一个保存“是否导出空白lptxt”勾选状态的变量
+export_blank_lptxt_var = tk.IntVar(value=0)
 
+def on_export_lptxt_change():
+    if export_lptxt_var.get():
+        export_blank_lptxt_var.set(0)
+
+def on_export_blank_lptxt_change():
+    if export_blank_lptxt_var.get():
+        export_lptxt_var.set(0)
+
+# 更新“导出lptxt”勾选框的回调
+export_lptxt_checkbox.config(command=on_export_lptxt_change)
+
+# 创建“导出空白lptxt”勾选框，放在“导出lptxt”右边
+export_blank_lptxt_checkbox = tk.Checkbutton(root, text="仅导出坐标", variable=export_blank_lptxt_var, command=on_export_blank_lptxt_change)
+export_blank_lptxt_checkbox.grid(row=4, column=2, sticky='w')
 # 提取PDF按钮
 extract_pdf_button = tk.Button(root, text="提取PDF", command=extract_pdf)
-extract_pdf_button.grid(row=4, column=2, columnspan=3, padx=20, pady=20)
+extract_pdf_button.grid(row=4, column=3, columnspan=3, padx=20, pady=20)
 
 # 启动主循环
 root.mainloop()
