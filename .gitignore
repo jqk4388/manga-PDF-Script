@@ -1,4 +1,4 @@
 漫画PDF文本提取器.spec
 build/*.*
 dist/*.*
-__pycache__/extracted_PDF_JPtext.cpython-311.pyc
+__pycache__/*.*
