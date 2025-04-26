@@ -31,7 +31,9 @@ def select_pdf_folder():
     return folder_selected
 
 # 定义一个函数来合并pdf文件，并设置右侧装订方向
-def merge_pdf_with_binding(out_path):
+def merge_pdf_with_binding():
+    initial_dir = os.getcwd()
+    output_dir = initial_dir
     while True:
         pdf_files = get_pdf_files()
         if pdf_files:
@@ -42,6 +44,8 @@ def merge_pdf_with_binding(out_path):
             print("未选择文件夹，程序终止。")
             return
         os.chdir(folder)
+        # 输出目录为所选文件夹的父目录
+        output_dir = os.path.dirname(folder)
     writer = PdfWriter()
     # 合并PDF文件
     for file in pdf_files:
@@ -53,9 +57,13 @@ def merge_pdf_with_binding(out_path):
     writer.viewer_preferences.direction = "/R2L"
     for page in writer.pages:
         page.compress_content_streams()
+    #父目录的名字
+    parent_dir = os.path.basename(output_dir)    
+    out_name = parent_dir + ".pdf"
+    out_path = os.path.join(output_dir, out_name)
     with open(out_path, "wb") as output_pdf:
         writer.write(output_pdf)
+    return out_path
 
-# 调用merge_pdf_with_binding函数，传入输出路径（可以自己修改）
-merge_pdf_with_binding('merged.pdf')
-os.startfile('merged.pdf')
+# 调用merge_pdf_with_binding函数，传入输出文件名
+out_pdf_path = merge_pdf_with_binding()
