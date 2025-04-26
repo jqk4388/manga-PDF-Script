@@ -18,7 +18,8 @@ def run():
             rubi_size, 
             x_threshold, 
             y_threshold, 
-            include_font_info
+            include_font_info,
+            font_scale_var  #字号放大
         )
         messagebox.showinfo("完成", "批量处理完成！")
     except Exception as e:
@@ -26,17 +27,17 @@ def run():
 
 root = tk.Tk()
 root.title("PDF批量注释工具")
-# 设置窗口大小
-window_width = 200
-window_height = 250
-root.geometry(f"{window_width}x{window_height}")
+root.resizable(True, True)  # 允许用户调整窗口大小
 
-# 计算屏幕居中位置
+# 启动时居中窗口（不指定固定宽高）
+root.update_idletasks()
+win_width = root.winfo_reqwidth()
+win_height = root.winfo_reqheight()
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
-x = (screen_width - window_width) // 2
-y = (screen_height - window_height) // 2
-root.geometry(f"{window_width}x{window_height}+{x}+{y}")  # 设置窗口位置
+x = (screen_width - win_width) // 2
+y = (screen_height - win_height) // 2
+root.geometry(f"+{x}+{y}")
 
 tk.Label(root, text="假名字号过滤:").grid(row=0, column=0)
 rubi_size_var = tk.DoubleVar(value=7.3)
@@ -50,9 +51,19 @@ tk.Label(root, text="Y轴偏移量:").grid(row=2, column=0)
 y_var = tk.DoubleVar(value=5000)
 tk.Scale(root, from_=0, to=9000, resolution=2, orient="horizontal", variable=y_var).grid(row=2, column=1)
 
+# 新增：字号放大倍率变量和滑块
+tk.Label(root, text="放大偏移倍率").grid(row=4, column=0, sticky='w')
+font_scale_var = tk.StringVar(value="1.5")
+font_scale_slider = tk.Scale(root, from_=0.1, to=5, resolution=0.1, orient=tk.HORIZONTAL,
+                             variable=font_scale_var)
+font_scale_slider.set(1.5)
+font_scale_slider.grid(row=4, column=1, sticky="ew")
+font_scale_entry = tk.Entry(root, textvariable=font_scale_var, width=6)
+font_scale_entry.grid(row=4, column=2, sticky="ew")
+
 fontinfo_var = tk.BooleanVar()
 tk.Checkbutton(root, text="注释文本中包含字体信息", variable=fontinfo_var).grid(row=3, columnspan=2)
 
-tk.Button(root, text="选择PDF并执行", command=run).grid(row=4, columnspan=2, pady=10)
+tk.Button(root, text="选择PDF并执行", command=run).grid(row=5, columnspan=2, pady=10)
 
 root.mainloop()
