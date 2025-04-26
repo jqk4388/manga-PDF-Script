@@ -26,7 +26,8 @@ def extract_worker(pdf_list):
         print(f"Text Size: {text_size_var.get()}")
         print(f"X Offset: {x_offset_var.get()}")
         print(f"Y Offset: {y_offset_var.get()}")
-        extracted_PDF_JPtext.main(export_lptxt_var, export_blank_lptxt_var, pagekuaye, path, text_size_var, x_offset_var, y_offset_var)
+        jiyingshe_info = jiyingshe_var.get()
+        extracted_PDF_JPtext.main(jiyingshe_info,export_lptxt_var, export_blank_lptxt_var, pagekuaye, path, text_size_var, x_offset_var, y_offset_var)
 
 def extract_pdf():
     if file_paths:
@@ -112,6 +113,10 @@ text_size_entry = tk.Entry(root, textvariable=text_size_var, width=6)
 text_size_entry.grid(row=1, column=2, sticky="ew") 
 text_size_entry.bind("<Return>", lambda event: update_text_size_slider(text_size_var.get()))
 
+jiyingshe_var = tk.BooleanVar(value=1)
+jiyingshe_checkbox = tk.Checkbutton(root, text="讲谈社集英社勾选\n小学馆不勾选", variable=jiyingshe_var)
+jiyingshe_checkbox.grid(row=1, column=3)
+
 # 滑块2和文本框：筛选 x 轴变动阈值
 tk.Label(root, text="x 轴变动阈值").grid(row=2, column=0, sticky='w')
 x_offset_var = tk.StringVar(value="20.00")
@@ -143,7 +148,7 @@ export_lptxt_var = tk.IntVar(value=1)
 checkbox = tk.Checkbutton(root, text="是否跨页", variable=checkbox_var, command=update_page)
 checkbox.grid(row=4, column=0)
 
-# 创建“是否导出lptxt”勾选框，放在“是否跨页”右边
+# 创建“是否导出lptxt”勾选框
 export_lptxt_checkbox = tk.Checkbutton(root, text="导出lptxt", variable=export_lptxt_var)
 export_lptxt_checkbox.grid(row=4, column=1, sticky='w')
 # 定义一个保存“是否导出空白lptxt”勾选状态的变量
@@ -157,10 +162,19 @@ def on_export_blank_lptxt_change():
     if export_blank_lptxt_var.get():
         export_lptxt_var.set(0)
 
+def on_jiyingshe_change(*args):
+    state = tk.DISABLED if jiyingshe_var.get() else tk.NORMAL
+    text_size_slider.config(state=state)
+
+# 绑定变量变化事件
+jiyingshe_var.trace_add("write", on_jiyingshe_change)
+# 启动时根据默认值设置控件状态
+on_jiyingshe_change()
+
 # 更新“导出lptxt”勾选框的回调
 export_lptxt_checkbox.config(command=on_export_lptxt_change)
 
-# 创建“导出空白lptxt”勾选框，放在“导出lptxt”右边
+# 创建“导出空白lptxt”勾选框
 export_blank_lptxt_checkbox = tk.Checkbutton(root, text="仅导出坐标", variable=export_blank_lptxt_var, command=on_export_blank_lptxt_change)
 export_blank_lptxt_checkbox.grid(row=4, column=2, sticky='w')
 # 提取PDF按钮

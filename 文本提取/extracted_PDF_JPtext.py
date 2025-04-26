@@ -16,7 +16,7 @@ def is_new_block(prev_char, curr_char, x_position_threshold, y_position_threshol
 
 
 
-def extract_readtext_from_pdf(pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold):
+def extract_readtext_from_pdf(jiyingshe_info, pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold):
     """从PDF中提取文本，并过滤假名注音，按块分类，返回文本、pdf对象和pages"""
     # 确保传入的阈值是浮点数，如果是 StringVar，需要调用 get() 提取实际值
     if isinstance(pagekuaye, tk.StringVar):
@@ -48,8 +48,11 @@ def extract_readtext_from_pdf(pagekuaye, file_path, rubi_size, x_position_thresh
                 block_text = []  # 当前文字块
                 prev_char = None
                 for char in char_data:
-                    # 如果字体大小大于某个值，且不是【A-OTF リュウミン Pr6N B-KL】字体（假名），则保留
-                    if char["size"] > rubi_size and char["fontname"] not in {"A-OTF リュウミン Pr6N B-KL", "RyuminPr6N-Bold"}:
+                    if jiyingshe_info:
+                        rubyfliter = "RyuminPr6N-Bold" and "RyuminPro-Medium" and 'ATC-*303*002030ea30e530a630df30f3*M' not in char["fontname"]
+                    else:
+                        rubyfliter = char["size"] > rubi_size
+                    if rubyfliter:
                         if prev_char is not None and is_new_block(prev_char, char, x_position_threshold, y_position_threshold):
                             # 如果是新块，把前一个块加入到页文本中，并开始新的块
                             page_text.append(''.join(block_text) + '\n')
@@ -71,7 +74,7 @@ def extract_readtext_from_pdf(pagekuaye, file_path, rubi_size, x_position_thresh
         print(f"提取PDF时发生错误: {str(e)}")
         return None, None, None
 
-def extract_lptext_from_pdf(blank, pagekuaye, rubi_size, x_position_threshold, y_position_threshold, pdf=None, pages=None):
+def extract_lptext_from_pdf(jiyingshe_var, blank, pagekuaye, rubi_size, x_position_threshold, y_position_threshold, pdf=None, pages=None):
     """从PDF中提取文本，并过滤假名注音，按块分类。可复用已打开的pdf和pages。"""
     # 确保传入的阈值是浮点数，如果是 StringVar，需要调用 get() 提取实际值
     if isinstance(pagekuaye, tk.StringVar):
@@ -109,8 +112,11 @@ def extract_lptext_from_pdf(blank, pagekuaye, rubi_size, x_position_threshold, y
                 rect_y0 = 0
                 
                 for char in char_data:
-                        # 如果字体大小大于某个值，且不是【A-OTF リュウミン Pr6N B-KL】字体（假名），则保留
-                    if char["size"] > rubi_size and char["fontname"] not in {"A-OTF リュウミン Pr6N B-KL", "RyuminPr6N-Bold"}:
+                    if jiyingshe_var:
+                        rubyfliter = "RyuminPr6N-Bold" and "RyuminPro-Medium" and 'ATC-*303*002030ea30e530a630df30f3*M' not in char["fontname"]
+                    else:
+                        rubyfliter = char["size"] > rubi_size
+                    if rubyfliter:
                         if prev_char:
                             rect_x0 = prev_char['x0']/page_width
                             rect_y0 = 1 - prev_char['y0']/page_height
@@ -214,24 +220,24 @@ def save_lptext_to_file(text, pdf_file_path):
     except Exception as e:
         print(f"保存文件时出错: {str(e)}")
 
-def main(export_lptxt_var, export_blank_lptxt_var, pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold):
+def main(jiyingshe_var,export_lptxt_var, export_blank_lptxt_var, pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold):
     """主函数，负责调用各个步骤并处理异常"""
     try:
         export_lptxt_var = int(export_lptxt_var.get())
         export_blank_lptxt_var = int(export_blank_lptxt_var.get())
         filename = os.path.basename(file_path)
         print(f"正在处理文件: {filename}")
-        extracted_text, pdf, pages = extract_readtext_from_pdf(pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold)
+        extracted_text, pdf, pages = extract_readtext_from_pdf(jiyingshe_var, pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold)
         if extracted_text:
             # print("文本提取完成，正在保存...")
             save_text_to_file(extracted_text, file_path)
             if export_lptxt_var == 0:
                 if export_blank_lptxt_var == 1:
-                    extracted_lptext = extract_lptext_from_pdf(1, pagekuaye, rubi_size, x_position_threshold, y_position_threshold, pdf, pages)
+                    extracted_lptext = extract_lptext_from_pdf(jiyingshe_var,1, pagekuaye, rubi_size, x_position_threshold, y_position_threshold, pdf, pages)
                     # print("LP文本提取完成，正在保存...")
                     save_lptext_to_file(extracted_lptext, file_path)
             else:
-                extracted_lptext = extract_lptext_from_pdf(0, pagekuaye, rubi_size, x_position_threshold, y_position_threshold, pdf, pages)
+                extracted_lptext = extract_lptext_from_pdf(jiyingshe_var,0, pagekuaye, rubi_size, x_position_threshold, y_position_threshold, pdf, pages)
                 # print("LP文本提取完成，正在保存...")
                 save_lptext_to_file(extracted_lptext, file_path)
         else:
