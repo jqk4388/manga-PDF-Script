@@ -22,6 +22,7 @@ def add_annotations_to_pdf(
     y_position_threshold, 
     include_font_info,
     font_scale,  # 字号放大默认1.5
+    jiyingshe_info
 ):
     """
     批量处理PDF文件，在每个文字块右上角添加注释。
@@ -42,7 +43,11 @@ def add_annotations_to_pdf(
                 block_count = 0
                 for idx, char in enumerate(char_data):
                     # print(f"    字符{idx}: '{char['text']}' 字号:{char['size']} 字体:{char['fontname']} x0:{char['x0']} top:{char['top']}")
-                    if char["size"] > rubi_size and char["fontname"] not in {"A-OTF リュウミン Pr6N B-KL", "RyuminPr6N-Bold"}:
+                    if jiyingshe_info:
+                        rubyfliter = "RyuminPr6N-Bold" and "RyuminPro-Medium" and 'ATC-*303*002030ea30e530a630df30f3*M' not in char["fontname"]
+                    else:
+                        rubyfliter = char["size"] > rubi_size 
+                    if rubyfliter:
                         if prev_char is not None and is_new_block(prev_char, char, x_position_threshold, y_position_threshold):
                             if block_text and first_char:
                                 text = ''.join(block_text)
