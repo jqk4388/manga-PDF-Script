@@ -1,5 +1,7 @@
 import pdfplumber
 import tkinter as tk
+from tkinter import simpledialog
+from pdfminer.pdfdocument import PDFPasswordIncorrect
 import os
 import re
 
@@ -16,13 +18,23 @@ def is_new_block(prev_char, curr_char, x_position_threshold, y_position_threshol
 
 
 
+def handle_pdf_password_exception(e, file_path):
+    """判断是否为PDF密码错误异常，如果是则弹窗要求输入密码，否则返回None"""
+    if isinstance(e, PDFPasswordIncorrect):
+        root = tk.Tk()
+        root.withdraw()
+        pwd = simpledialog.askstring("PDF加密", f"文件 {os.path.basename(file_path)} 需要密码，请输入：", show='*', parent=root)
+        root.destroy()
+        return pwd
+    return None
+
 def extract_readtext_from_pdf(jiyingshe_info, pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold, password=None):
     """从PDF中提取文本，并过滤假名注音，按块分类，返回文本、pdf对象和pages"""
     # 确保传入的阈值是浮点数，如果是 StringVar，需要调用 get() 提取实际值
-    if isinstance(pagekuaye, tk.StringVar):
-        pagekuaye = float(pagekuaye.get())
-    else:
+    if isinstance(pagekuaye, tk.IntVar):
         pagekuaye = int(pagekuaye.get())
+    else:
+        pagekuaye = int(pagekuaye)
     if isinstance(rubi_size, tk.StringVar):
         rubi_size = float(rubi_size.get())
     else:
@@ -36,7 +48,10 @@ def extract_readtext_from_pdf(jiyingshe_info, pagekuaye, file_path, rubi_size, x
     else:
         y_position_threshold = float(y_position_threshold)
     try:
-        pdf = pdfplumber.open(file_path)
+        if password is not None:
+            pdf = pdfplumber.open(file_path, password=password)
+        else:
+            pdf = pdfplumber.open(file_path)
         pages = pdf.pages
         total_pages = len(pages)
         full_text = []
@@ -78,6 +93,12 @@ def extract_readtext_from_pdf(jiyingshe_info, pagekuaye, file_path, rubi_size, x
         return '\n'.join(full_text), pdf, pages
     
     except Exception as e:
+        pwd = handle_pdf_password_exception(e, file_path)
+        if pwd:
+            # 用新密码递归调用自己
+            return extract_readtext_from_pdf(
+                jiyingshe_info, pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold, password=pwd
+            )
         print(f"提取PDF时发生错误: {str(e)}")
         return None, None, None
 
@@ -189,7 +210,7 @@ def extract_lptext_from_pdf(jiyingshe_var, blank, pagekuaye, rubi_size, x_positi
         return '\n'.join(full_text)
     
     except Exception as e:
-        print(f"提取PDF时发生错误: {str(e)}")
+        print(f"提取LPtxt时发生错误: {str(e)}")
         return None
 
 def save_text_to_file(text, pdf_file_path):
@@ -201,9 +222,22 @@ def save_text_to_file(text, pdf_file_path):
         # 使用正则表达式进行替换
         text = re.sub(r"★校了台紙★", "", text)
         text = re.sub(r"[︙]", "…", text)
-        text = re.sub(r"S\nA\nM\nP\nL\nE", "", text) 
         text = re.sub(r"[Ⅰ Ⅴ Ⅱ Ⅵ Ⅶ]+", "——", text)
         text = re.sub(r"(\(cid:\d+\))+", "——", text)
+        text = re.sub(r"A", "！", text)
+        text = re.sub(r"B", "！！", text)
+        text = re.sub(r"C", "!!!", text)
+        text = re.sub(r"D", "!!!!", text)
+        text = re.sub(r"E", "？", text)
+        text = re.sub(r"F", "！？", text)
+        text = re.sub(r"FFFF", "～～～～", text)
+        text = re.sub(r"G", "～", text)
+        text = re.sub(r"g", "—", text) #横排——
+        text = re.sub(r"h", "—", text) #竖排——
+        text = re.sub(r"H", "～～", text)
+        text = re.sub(r"I", "♡", text)
+        text = re.sub(r"j", "—", text)
+        text = re.sub(r"J", "～", text)
         print(f"正在保存文件 {output_file}")
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(text)
@@ -241,10 +275,7 @@ def main(jiyingshe_var,export_lptxt_var, export_blank_lptxt_var, pagekuaye, file
         export_blank_lptxt_var = int(export_blank_lptxt_var.get())
         filename = os.path.basename(file_path)
         print(f"正在处理文件: {filename}")
-        # 传递password参数
-        extracted_text, pdf, pages = extract_readtext_from_pdf(
-            jiyingshe_var, pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold
-        ) if password is None else extract_readtext_from_pdf(
+        extracted_text, pdf, pages =extract_readtext_from_pdf(
             jiyingshe_var, pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold, password=password
         )
         if extracted_text:

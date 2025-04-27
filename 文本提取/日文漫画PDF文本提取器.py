@@ -1,10 +1,10 @@
 import tkinter as tk
-from tkinter import filedialog, simpledialog, messagebox
+from tkinter import filedialog
 import extracted_PDF_JPtext
 import os
 import threading
 
-# 声明 file_paths 为全局变量（初始化为空列表）
+# 声明 file_paths 为全局变量
 file_paths = []
 
 def open_pdfs():
@@ -27,32 +27,10 @@ def extract_worker(pdf_list):
         print(f"X Offset: {x_offset_var.get()}")
         print(f"Y Offset: {y_offset_var.get()}")
         jiyingshe_info = jiyingshe_var.get()
-        password = None
-        while True:
-            try:
-                # 假设extracted_PDF_JPtext.main支持password参数
-                extracted_PDF_JPtext.main(
-                    jiyingshe_info,
-                    export_lptxt_var,
-                    export_blank_lptxt_var,
-                    pagekuaye,
-                    path,
-                    text_size_var,
-                    x_offset_var,
-                    y_offset_var,
-                    password=password
-                )
-                break  # 成功则跳出循环
-            except Exception as e:
-                # 检查是否为加密PDF的异常（可根据实际异常类型调整）
-                if "password" in str(e).lower() or "encrypted" in str(e).lower():
-                    password = simpledialog.askstring("PDF加密", f"文件 {os.path.basename(path)} 需要密码，请输入：", show='*')
-                    if password is None:
-                        messagebox.showinfo("提示", "已取消该文件的处理。")
-                        break
-                else:
-                    messagebox.showerror("错误", f"处理PDF时出错：{e}")
-                    break
+        password = password_var.get()  # 获取密码值
+        extracted_PDF_JPtext.main(jiyingshe_info, export_lptxt_var, export_blank_lptxt_var, 
+                                pagekuaye, path, text_size_var, x_offset_var, y_offset_var, 
+                                password=password)  # 传递密码参数
 
 def extract_pdf():
     if file_paths:
@@ -113,6 +91,12 @@ x = (screen_width - win_width) // 2
 y = (screen_height - win_height) // 2
 root.geometry(f"+{x}+{y}")
 
+# 添加密码输入框
+password_var = tk.StringVar(value="")
+tk.Label(root, text="PDF密码(无密码留空):").grid(row=5, column=0, sticky='w')
+password_entry = tk.Entry(root, textvariable=password_var, show="*")
+password_entry.grid(row=5, column=1, sticky="ew")
+
 # 定义一个变量来保存page的值
 pagekuaye = tk.IntVar(value=2)
 # 定义一个保存勾选状态的变量
@@ -139,7 +123,7 @@ text_size_entry.grid(row=1, column=2, sticky="ew")
 text_size_entry.bind("<Return>", lambda event: update_text_size_slider(text_size_var.get()))
 
 jiyingshe_var = tk.BooleanVar(value=1)
-jiyingshe_checkbox = tk.Checkbutton(root, text="少年漫画勾选\n青年少女漫画不勾选", variable=jiyingshe_var)
+jiyingshe_checkbox = tk.Checkbutton(root, text="假名过滤选项\n勾选按字体过滤\n不勾选按字号过滤", variable=jiyingshe_var)
 jiyingshe_checkbox.grid(row=1, column=3)
 
 # 滑块2和文本框：筛选 x 轴变动阈值
