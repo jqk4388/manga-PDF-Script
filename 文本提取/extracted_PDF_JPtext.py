@@ -16,7 +16,7 @@ def is_new_block(prev_char, curr_char, x_position_threshold, y_position_threshol
 
 
 
-def extract_readtext_from_pdf(jiyingshe_info, pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold):
+def extract_readtext_from_pdf(jiyingshe_info, pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold, password=None):
     """从PDF中提取文本，并过滤假名注音，按块分类，返回文本、pdf对象和pages"""
     # 确保传入的阈值是浮点数，如果是 StringVar，需要调用 get() 提取实际值
     if isinstance(pagekuaye, tk.StringVar):
@@ -49,7 +49,14 @@ def extract_readtext_from_pdf(jiyingshe_info, pagekuaye, file_path, rubi_size, x
                 prev_char = None
                 for char in char_data:
                     if jiyingshe_info:
-                        rubyfliter = "RyuminPr6N-Bold" and "RyuminPro-Medium" and 'ATC-*303*002030ea30e530a630df30f3*M' not in char["fontname"]
+                        rubyfliter = all(
+                            x not in char["fontname"]
+                            for x in [
+                                "RyuminPr6N-Bold",
+                                "RyuminPro-Medium",
+                                "ATC-*303*002030ea30e530a630df30f3*M"
+                            ]
+                        )
                     else:
                         rubyfliter = char["size"] > rubi_size
                     if rubyfliter:
@@ -113,7 +120,14 @@ def extract_lptext_from_pdf(jiyingshe_var, blank, pagekuaye, rubi_size, x_positi
                 
                 for char in char_data:
                     if jiyingshe_var:
-                        rubyfliter = "RyuminPr6N-Bold" and "RyuminPro-Medium" and 'ATC-*303*002030ea30e530a630df30f3*M' not in char["fontname"]
+                        rubyfliter = all(
+                            x not in char["fontname"]
+                            for x in [
+                                "RyuminPr6N-Bold",
+                                "RyuminPro-Medium",
+                                "ATC-*303*002030ea30e530a630df30f3*M"
+                            ]
+                        )
                     else:
                         rubyfliter = char["size"] > rubi_size
                     if rubyfliter:
@@ -220,14 +234,19 @@ def save_lptext_to_file(text, pdf_file_path):
     except Exception as e:
         print(f"保存文件时出错: {str(e)}")
 
-def main(jiyingshe_var,export_lptxt_var, export_blank_lptxt_var, pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold):
+def main(jiyingshe_var,export_lptxt_var, export_blank_lptxt_var, pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold, password=None):
     """主函数，负责调用各个步骤并处理异常"""
     try:
         export_lptxt_var = int(export_lptxt_var.get())
         export_blank_lptxt_var = int(export_blank_lptxt_var.get())
         filename = os.path.basename(file_path)
         print(f"正在处理文件: {filename}")
-        extracted_text, pdf, pages = extract_readtext_from_pdf(jiyingshe_var, pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold)
+        # 传递password参数
+        extracted_text, pdf, pages = extract_readtext_from_pdf(
+            jiyingshe_var, pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold
+        ) if password is None else extract_readtext_from_pdf(
+            jiyingshe_var, pagekuaye, file_path, rubi_size, x_position_threshold, y_position_threshold, password=password
+        )
         if extracted_text:
             # print("文本提取完成，正在保存...")
             save_text_to_file(extracted_text, file_path)

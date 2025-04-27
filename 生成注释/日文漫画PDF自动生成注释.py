@@ -74,7 +74,7 @@ fontinfo_var = tk.BooleanVar()
 tk.Checkbutton(root, text="注释文本中包含字体信息", variable=fontinfo_var).grid(row=4, columnspan=2)
 
 jiyingshe_var = tk.BooleanVar(value=1)
-jiyingshe_checkbox = tk.Checkbutton(root, text="讲谈社集英社勾选\n小学馆不勾选", variable=jiyingshe_var)
+jiyingshe_checkbox = tk.Checkbutton(root, text="少年漫画勾选\n青年少女漫画不勾选", variable=jiyingshe_var)
 jiyingshe_checkbox.grid(row=0, column=2)
 
 tk.Button(root, text="选择PDF并执行", command=run).grid(row=4, column=2, pady=10)

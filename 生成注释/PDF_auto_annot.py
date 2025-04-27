@@ -44,7 +44,14 @@ def add_annotations_to_pdf(
                 for idx, char in enumerate(char_data):
                     # print(f"    字符{idx}: '{char['text']}' 字号:{char['size']} 字体:{char['fontname']} x0:{char['x0']} top:{char['top']}")
                     if jiyingshe_info:
-                        rubyfliter = "RyuminPr6N-Bold" and "RyuminPro-Medium" and 'ATC-*303*002030ea30e530a630df30f3*M' not in char["fontname"]
+                        rubyfliter = all(
+                            x not in char["fontname"]
+                            for x in [
+                                "RyuminPr6N-Bold",
+                                "RyuminPro-Medium",
+                                "ATC-*303*002030ea30e530a630df30f3*M",
+                            ]
+                        )
                     else:
                         rubyfliter = char["size"] > rubi_size 
                     if rubyfliter:
