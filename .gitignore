@@ -1,4 +1,6 @@
 漫画PDF文本提取器.spec
 build/*.*
 dist/*.*
+dist/*/*.*
 __pycache__/*.*
+dist/*/*/*
