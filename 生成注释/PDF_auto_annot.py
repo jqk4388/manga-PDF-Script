@@ -148,8 +148,10 @@ def add_annotations_to_pdf(
                                     print(f"      新文字块[{block_count+1}]，注释内容: {text}，位置: {rect}")
                                     annot = page.add_text_annot(rect.tl, text)
                                     annot.set_opacity(0.75)
-                                    annot.set_info(info={"title": f"{fontname}",
-                                                         "subject": f"{first_char['size']*0.708661:.1f}",})
+                                    annot.set_info(info={
+                                        "title": "Auto",
+                                        "subject": f"{{字体：{fontname}}}{{字号：{first_char['size']*0.708661:.1f}}}"
+                                    })
                                 block_count += 1
                             block_text = []
                             block_chars = []
@@ -171,8 +173,10 @@ def add_annotations_to_pdf(
                         print(f"      最后文字块[{block_count+1}]，注释内容: {text}，位置: {rect}")
                         annot = page.add_text_annot(rect.tl, text)
                         annot.set_opacity(0.75)
-                        annot.set_info(info={"title": f"{fontname}",
-                                            "subject": f"{first_char['size']*0.708661:.1f}",})
+                        annot.set_info(info={
+                            "title": "Auto",
+                            "subject": f"{{字体：{fontname}}}{{字号：{first_char['size']*0.708661:.1f}}}"
+                        })
                 # 添加注释到页面
                 print(f"    本页共添加注释数: {len(page.get_text('dict')['blocks'])}")
         # 保存新PDF
