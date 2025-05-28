@@ -150,7 +150,7 @@ def add_annotations_to_pdf(
                                     annot.set_opacity(0.75)
                                     annot.set_info(info={
                                         "title": "Auto",
-                                        "subject": f"{{字体：{fontname}}}{{字号：{first_char['size']*0.708661:.1f}}}"
+                                        "subject": f"字体：{fontname}}}{{字号：{first_char['size']*0.708661:.1f}"
                                     })
                                 block_count += 1
                             block_text = []

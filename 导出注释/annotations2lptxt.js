@@ -153,7 +153,7 @@ function convertListToLptxt(totalPages, annotations) {
 
 // 格式化输出数据
 function formatData(annot) {
-    return "\n----------------[" + annot.index + "]----------------[" + annot.coordinates_percentage[0] + "," + annot.coordinates_percentage[1] + ",1]\n" + annot.subject + annot.content;
+    return "\n----------------[" + annot.index + "]----------------[" + annot.coordinates_percentage[0] + "," + annot.coordinates_percentage[1] + ",1]\n" + "{"+annot.subject+"}" + annot.content;
 }
 
 // 定义函数以将输出导出为LPTXT

@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from PDF_auto_annot import add_annotations_to_pdf
-version = "250518"
+version = "250528"
 
 def run():
     pdf_paths = filedialog.askopenfilenames(
