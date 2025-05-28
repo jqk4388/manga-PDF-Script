@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from PDF_auto_annot import add_annotations_to_pdf
-version = "250528"
+version = "250529"
 
 def run():
     pdf_paths = filedialog.askopenfilenames(
@@ -46,13 +46,13 @@ rubi_size_var = tk.DoubleVar(value=6.5)
 rubi_size_scale = tk.Scale(root, from_=4, to=10, resolution=0.01, orient="horizontal", variable=rubi_size_var)
 rubi_size_scale.grid(row=0, column=1)
 
-tk.Label(root, text="竖排行距倍数：").grid(row=1, column=0)
+tk.Label(root, text="竖向行距倍数：").grid(row=1, column=0)
 x_var = tk.DoubleVar(value=1.92)
 tk.Scale(root, from_=1, to=3, resolution=0.01, orient="horizontal", variable=x_var).grid(row=1, column=1)
 
-tk.Label(root, text="横排行距倍数：").grid(row=2, column=0)
-tk.Label(root, text="数值越小，\n拆分的气泡越多").grid(row=1, column=2)
-y_var = tk.DoubleVar(value=3)
+tk.Label(root, text="横向行距倍数：").grid(row=2, column=0)
+tk.Label(root, text="数值越小，\n拆分的气泡越多。\n上下拆分调小竖向倍数\n左右拆分调小横向倍数").grid(row=1, column=2)
+y_var = tk.DoubleVar(value=2.35)
 tk.Scale(root, from_=1, to=5, resolution=0.01, orient="horizontal", variable=y_var).grid(row=2, column=1)
 
 # 字号不放大，只偏移

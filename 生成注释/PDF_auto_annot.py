@@ -6,6 +6,7 @@ import re
 # 过滤字体组,着重号等
 FILTER_FONTS = [
     "KentenGeneric",
+    "AnitoStd",
 ]
 # 标点字体组
 FILTER_PUNCTUATION_FONTS = [
@@ -98,6 +99,20 @@ def get_block_fontname(block_chars, first_char):
         return fontname.split('+', 1)[-1]
     return fontname
 
+def should_filter_by_tag(char):
+    tag = char.get('tag', None)
+    if tag == 'PlacedPDF':
+        return False
+    if tag == 'Metadata' or tag == 'OC':
+        return True
+    if tag is None:
+        color = char.get('non_stroking_color', None)
+        if color == (0, 0, 0, 0) or color == (0, 0, 0, 1):
+            return True
+        else:
+            return False
+    return False
+
 def add_annotations_to_pdf(
     pdf_paths, 
     rubi_size, 
@@ -127,6 +142,9 @@ def add_annotations_to_pdf(
                 for idx, char in enumerate(char_data):
                     # 过滤假名
                     rubyfliter = not should_filter_kana(char, prev_char, rubi_size)
+                    # tag过滤
+                    if should_filter_by_tag(char):
+                        rubyfliter = False
                     if rubyfliter:
                         if prev_char is not None and is_new_block(prev_char, char, x_position_threshold, y_position_threshold):
                             if block_text and first_char:
@@ -178,7 +196,7 @@ def add_annotations_to_pdf(
                             "subject": f"{{字体：{fontname}}}{{字号：{first_char['size']*0.708661:.1f}}}"
                         })
                 # 添加注释到页面
-                print(f"    本页共添加注释数: {len(page.get_text('dict')['blocks'])}")
+                print(f"    本页共添加注释数: {block_count}")
         # 保存新PDF
         out_path = os.path.splitext(pdf_path)[0] + "_annotated.pdf"
         print(f"保存带注释的PDF到: {out_path}")
