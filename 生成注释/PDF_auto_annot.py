@@ -7,6 +7,7 @@ import re
 FILTER_FONTS = [
     "KentenGeneric",
     "AnitoStd",
+    "NumberOnly",
 ]
 # 标点字体组
 FILTER_PUNCTUATION_FONTS = [
@@ -99,7 +100,7 @@ def get_block_fontname(block_chars, first_char):
         return fontname.split('+', 1)[-1]
     return fontname
 
-def should_filter_by_tag(char):
+def should_filter_by_tag(char, filter_color):
     tag = char.get('tag', None)
     if tag == 'PlacedPDF':
         return False
@@ -107,10 +108,18 @@ def should_filter_by_tag(char):
         return True
     if tag is None:
         color = char.get('non_stroking_color', None)
-        if color == (0, 0, 0, 0) or color == (0, 0, 0, 1):
-            return True
+        if filter_color:
+            # 勾选时
+            if color == (0, 0, 0, 0) or color == (0, 0, 0, 1):
+                return True
+            else:
+                return False
         else:
-            return False
+            # 不勾选时
+            if color == (0, 0, 0, 0):
+                return True
+            else:
+                return False
     return False
 
 def add_annotations_to_pdf(
@@ -120,6 +129,7 @@ def add_annotations_to_pdf(
     y_position_threshold, 
     include_font_info,
     font_scale, 
+    filter_color,  # 新增参数
 ):
     """
     批量处理PDF文件，在每个文字块右上角添加注释。
@@ -143,7 +153,7 @@ def add_annotations_to_pdf(
                     # 过滤假名
                     rubyfliter = not should_filter_kana(char, prev_char, rubi_size)
                     # tag过滤
-                    if should_filter_by_tag(char):
+                    if should_filter_by_tag(char, filter_color):
                         rubyfliter = False
                     if rubyfliter:
                         if prev_char is not None and is_new_block(prev_char, char, x_position_threshold, y_position_threshold):
@@ -193,7 +203,7 @@ def add_annotations_to_pdf(
                         annot.set_opacity(0.75)
                         annot.set_info(info={
                             "title": "Auto",
-                            "subject": f"{{字体：{fontname}}}{{字号：{first_char['size']*0.708661:.1f}}}"
+                            "subject": f"字体：{fontname}}}{{字号：{first_char['size']*0.708661:.1f}"
                         })
                 # 添加注释到页面
                 print(f"    本页共添加注释数: {block_count}")
