@@ -1,7 +1,7 @@
 import fitz  # PyMuPDF  
 import os  
 from tkinter import Tk  
-from tkinter.filedialog import askopenfilename  
+from tkinter.filedialog import askopenfilenames  
   
 def rect_to_percentage(rect, page_width, page_height):  
     return [  
@@ -21,12 +21,16 @@ def extract_annotations(pdf_path):
         page_height = page.rect.height
   
         for annot in annot_list:
+            subject = annot.info.get("subject", "")
+            if not subject:
+                subject = "字体：默认"
             annot_info = {
                 "page": page_num + 1,
                 "type": annot.type[0],  # Annotation type
                 "content": annot.info.get("content", ""),  # Annotation content
                 "coordinates_percentage": rect_to_percentage(annot.rect, page_width, page_height),  # Annotation coordinates as percentage
-                "creation_date": annot.info.get("creationDate", "")  # Annotation creation date
+                "creation_date": annot.info.get("modDate", ""),  # Annotation creation date
+                "subject": subject
             }
             annotations.append(annot_info)
             
@@ -62,7 +66,7 @@ def annotations_to_txt(annotations, output_path):
 # 转换列表到labelplus_txt
 def format_data(annotations):
     """格式化单个标注"""
-    formatted = f"\n----------------[{annotations['index']}]----------------[{annotations['coordinates_percentage'][0]},{annotations['coordinates_percentage'][1]},1]\n{annotations['content']}"
+    formatted = f"\n----------------[{annotations['index']}]----------------[{annotations['coordinates_percentage'][0]},{annotations['coordinates_percentage'][1]},1]\n{{{annotations['subject']}}}{annotations['content']}"
     return formatted
 
 def convert_list_to_lptxt(output_lptxt_path, total_pages, annotations):      
@@ -100,34 +104,35 @@ if __name__ == "__main__":
     root = Tk()  
     root.withdraw()  # 隐藏Tkinter根窗口  
   
-    # 弹出文件选择对话框  
-    pdf_path = askopenfilename(  
-        title="选择一个PDF文件",  
+    # 弹出文件选择对话框，允许多选  
+    pdf_paths = askopenfilenames(  
+        title="选择一个或多个PDF文件",  
         filetypes=[("PDF文件", "*.pdf")]  
     )  
   
-    if pdf_path:  
-        # 获取PDF文件的目录和文件名（不带扩展名）  
-        pdf_dir = os.path.dirname(pdf_path)  
-        pdf_name = os.path.splitext(os.path.basename(pdf_path))[0]  
-  
-        # # 构建JSON文件的路径  
-        # output_json_path = os.path.join(pdf_dir, f"{pdf_name}.json")  
-        # 构建TXT文件的路径  
-        output_txt_path = os.path.join(pdf_dir, f"{pdf_name}.txt")  
-        # 构建TX文件的路径  
-        output_txt_labelplus_path = os.path.join(pdf_dir, f"{pdf_name}_lp.txt")  
-  
-        annotations,total_pages = extract_annotations(pdf_path)
-        # annotations_to_json(annotations, output_json_path) 
-        
-        # 生成可读的txt
-        # annotations_to_txt(annotations, output_txt_path)
-        # 生成labelplus格式的txt
-        convert_list_to_lptxt(output_txt_labelplus_path, total_pages, annotations)  
-  
-        print(f"Annotations extracted and saved to {output_txt_labelplus_path} and {output_txt_path}")  
+    if pdf_paths:  
+        for pdf_path in pdf_paths:
+            # 获取PDF文件的目录和文件名（不带扩展名）  
+            pdf_dir = os.path.dirname(pdf_path)  
+            pdf_name = os.path.splitext(os.path.basename(pdf_path))[0]  
+      
+            # # 构建JSON文件的路径  
+            # output_json_path = os.path.join(pdf_dir, f"{pdf_name}.json")  
+            # 构建TXT文件的路径  
+            output_txt_path = os.path.join(pdf_dir, f"{pdf_name}.txt")  
+            # 构建TX文件的路径  
+            output_txt_labelplus_path = os.path.join(pdf_dir, f"{pdf_name}_lp.txt")  
+      
+            annotations,total_pages = extract_annotations(pdf_path)
+            # annotations_to_json(annotations, output_json_path) 
+            
+            # 生成可读的txt
+            # annotations_to_txt(annotations, output_txt_path)
+            # 生成labelplus格式的txt
+            convert_list_to_lptxt(output_txt_labelplus_path, total_pages, annotations)  
+      
+            print(f"Annotations extracted and saved to {output_txt_labelplus_path} and {output_txt_path}")  
     else:  
         print("没有选择PDF文件")  
   
-# input('\n完成！')  
+# input('\n完成！')
