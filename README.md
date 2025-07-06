@@ -33,6 +33,6 @@
 - 运行后弹出窗口选择一个带注释的PDF，在PDF目录下导出同名TXT文件。
 **注意：python不能获取注释中加粗的字，建议使用Acrobat Pro JS 脚本导出。**
 
-**一键合并PDF** 批量合并PDF，自动排序。放在PDF文件夹下运行或者运行后选择PDF文件夹。
+**一键合并PDF** 批量合并PDF，自动排序。放在PDF文件夹下运行或者运行后选择PDF文件夹。当选择的文件夹内没有pdf的时候合并图片。
 
-    pip install pypdf
+    pip install pypdf pillow
