@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://ns.adobe.com/acrobat/workflow/2012" title="印刷转曲" description="" majorVersion="1" minorVersion="0">
+	<Sources>
+		<Folder path="/M/汉化/PDF"/>
+	</Sources>
+	<Group label="未标题">
+		<Command name="COMP:AddBackground" pauseBefore="false" promptUser="false">
+			<Items>
+				<Items name="WaterBackCmd">
+					<Item name="ANNOT" type="boolean" value="false"/>
+					<Item name="BACKGROUND" type="boolean" value="true"/>
+					<Item name="COLOR1" type="double" value="1.000000"/>
+					<Item name="COLOR2" type="double" value="1.000000"/>
+					<Item name="COLOR3" type="double" value="1.000000"/>
+					<Item name="COLOR4" type="double" value="0.000000"/>
+					<Item name="COLORSPACE" type="atom" value="DeviceRGB"/>
+					<Item name="END" type="integer" value="-1"/>
+					<Item name="FIXED_PRINT" type="boolean" value="false"/>
+					<Item name="FONT_CHARSET" type="atom" value=""/>
+					<Item name="FONT_ENCODING" type="atom" value=""/>
+					<Item name="FONT_NAME" type="atom" value=""/>
+					<Item name="FONT_SIZE" type="double" value="24.000000"/>
+					<Item name="FONT_TYPE" type="atom" value=""/>
+					<Item name="FROM_FILE" type="boolean" value="false"/>
+					<Item name="HORIZ_ALIGN" type="integer" value="1"/>
+					<Item name="HORIZ_VALUE" type="double" value="0.000000"/>
+					<Item name="ON_PRINT" type="boolean" value="true"/>
+					<Item name="ON_SCREEN" type="boolean" value="true"/>
+					<Item name="OPACITY" type="double" value="0.000000"/>
+					<Item name="REPLACE" type="boolean" value="false"/>
+					<Item name="ROTATION" type="integer" value="0"/>
+					<Item name="SCALE" type="double" value="-1.000000"/>
+					<Item name="SRCPAGE" type="integer" value="0"/>
+					<Item name="SRCTEXT" type="null"/>
+					<Item name="START" type="integer" value="-1"/>
+					<Item name="TEXT_ALIGN" type="integer" value="0"/>
+					<Item name="UNITS" type="integer" value="3"/>
+					<Item name="VERT_ALIGN" type="integer" value="1"/>
+					<Item name="VERT_VALUE" type="double" value="0.000000"/>
+					<Item name="WATERMARK" type="boolean" value="false"/>
+				</Items>
+			</Items>
+		</Command>
+		<Command name="WorkflowPlaybackSaveFiles" pauseBefore="false" promptUser="false">
+			<Items>
+				<Item name="AddToBaseName" type="boolean" value="true"/>
+				<Item name="DocSaveDestType" type="string" value="WorkflowPlaybackSave"/>
+				<Item name="DontOverwrite" type="boolean" value="true"/>
+				<Item name="EmbedIndex" type="boolean" value="false"/>
+				<Item name="FileVariation" type="integer" value="0"/>
+				<Item name="HandleOutput" type="boolean" value="true"/>
+				<Item name="InsertAfterBaseName" type="text" value="_outline"/>
+				<Item name="InsertBeforeBaseName" type="text" value=""/>
+				<Item name="NumbericNaming" type="boolean" value="false"/>
+				<Item name="OptimizePDF" type="boolean" value="true"/>
+				<Item name="PresetName" type="text" value="印刷转曲"/>
+				<Item name="RunPDFOptimizer" type="boolean" value="true"/>
+			</Items>
+		</Command>
+	</Group>
+</Workflow>

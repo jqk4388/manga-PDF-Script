@@ -158,6 +158,8 @@ function formatData(annot) {
 
 // 定义函数以将输出导出为LPTXT
 function exportAnnotationsToLPTXT(output) {
+    //获取当前文档的名字
+    var docName = this.documentFileName.replace(/\.pdf$/i, ""); // 去掉扩展名
     // 创建一个新的空白 PDF 文档
     var newDoc = app.newDoc(); // 创建新的文档
 
@@ -169,7 +171,7 @@ function exportAnnotationsToLPTXT(output) {
     field.value = output; // 将内容写入文本框
 
     // 保存新文档到用户文件夹
-    var tempFilePath = app.getPath("user") + "/output.pdf"; // 使用用户文件夹路径
+    var tempFilePath = app.getPath("user") + "/"+ docName + "_LPoutput.pdf"; // 使用用户文件夹路径
     newDoc.saveAs(tempFilePath); // 保存新文档
 
     // 关闭新文档

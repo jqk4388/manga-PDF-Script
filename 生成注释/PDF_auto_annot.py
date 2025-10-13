@@ -8,6 +8,7 @@ FILTER_FONTS = [
     "KentenGeneric",
     "AnitoStd",
     "NumberOnly",
+    "Yanmaga-komanon",
 ]
 # 标点字体组
 FILTER_PUNCTUATION_FONTS = [
