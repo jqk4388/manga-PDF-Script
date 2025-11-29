@@ -1,5 +1,5 @@
 import pdfplumber
-import fitz  # PyMuPDF
+import pymupdf  # PyMuPDF
 import os
 import re
 
@@ -138,7 +138,7 @@ def add_annotations_to_pdf(
     font_scale = float(font_scale.get())
     for pdf_path in pdf_paths:
         print(f"正在处理文件: {pdf_path}")
-        doc = fitz.open(pdf_path)
+        doc = pymupdf.open(pdf_path)
         with pdfplumber.open(pdf_path) as plumber_pdf:
             for page_number, (plumber_page, page) in enumerate(zip(plumber_pdf.pages, doc)):
                 print(f"  处理第 {page_number+1} 页")
@@ -172,7 +172,7 @@ def add_annotations_to_pdf(
                                 # 注释位置：第一个字符右上角，避免遮挡
                                 x = first_char["x0"] + first_char["width"]/3 + 2 * font_scale
                                 y = first_char["top"] - 10 * font_scale
-                                rect = fitz.Rect(x, y, x+20, y+20)
+                                rect = pymupdf.Rect(x, y, x+20, y+20)
                                 if 0 <= x <= page_width and 0 <= y <= page_height:
                                     print(f"      新文字块[{block_count+1}]，注释内容: {text}，位置: {rect}")
                                     annot = page.add_text_annot(rect.tl, text)
@@ -197,7 +197,7 @@ def add_annotations_to_pdf(
                         text = f"{{字体：{fontname}}}{{字号：{first_char['size']*0.708661:.1f}}}\n" + text
                     x = first_char["x0"] + first_char["width"] + 2 * font_scale
                     y = first_char["top"] - 10 * font_scale
-                    rect = fitz.Rect(x, y, x+20, y+20)
+                    rect = pymupdf.Rect(x, y, x+20, y+20)
                     if 0 <= x <= page_width and 0 <= y <= page_height:
                         print(f"      最后文字块[{block_count+1}]，注释内容: {text}，位置: {rect}")
                         annot = page.add_text_annot(rect.tl, text)

@@ -1,4 +1,4 @@
-import fitz  # PyMuPDF  
+import pymupdf  # PyMuPDF  
 import os  
 from tkinter import Tk  
 from tkinter.filedialog import askopenfilenames  
@@ -10,7 +10,7 @@ def rect_to_percentage(rect, page_width, page_height):
     ]  
   
 def extract_annotations(pdf_path):
-    document = fitz.open(pdf_path)
+    document = pymupdf.open(pdf_path)
     total_pages = document.page_count
     annotations = []
   

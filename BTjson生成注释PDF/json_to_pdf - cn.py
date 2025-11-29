@@ -1,3 +1,4 @@
+#pip install Pillow pypdfr PyMuPDF
 import json
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
@@ -5,8 +6,7 @@ from PIL import Image
 import os
 from pypdf import PdfWriter, PdfReader
 from pypdf.generic import DictionaryObject, NameObject, TextStringObject, ArrayObject, FloatObject
-import pdfplumber
-import fitz  # PyMuPDF
+import pymupdf
 # 获取 .py 文件的绝对路径
 file_path = os.path.abspath (__file__)
 # 获取 .py 文件所在的目录
@@ -18,7 +18,7 @@ os.chdir (dir_path)
 class JsonToPdfConverter:
     def __init__(self, root):
         self.root = root
-        self.root.title("JSON to PDF Converter v1.0-BY几千块")
+        self.root.title("JSON to PDF Converter_cn v1.0-BY几千块")
         self.root.geometry("600x250")
         # 设置窗口在屏幕中央
         self.center_window()
@@ -156,9 +156,9 @@ class JsonToPdfConverter:
                 img_width, img_height = img.size
             
             # 创建临时PDF页面
-            temp_pdf_page = fitz.open()  # 创建新的文档
+            temp_pdf_page = pymupdf.open()  # 创建新的文档
             page = temp_pdf_page.new_page(width=img_width, height=img_height)
-            page.insert_image(fitz.Rect(0, 0, img_width, img_height), filename=img_path)
+            page.insert_image(pymupdf.Rect(0, 0, img_width, img_height), filename=img_path)
             
             # 保存临时页面
             temp_page_path = f"temp_page_{i}.pdf"
@@ -193,7 +193,7 @@ class JsonToPdfConverter:
     def add_annotations_with_pymupdf(self, temp_pdf_path, output_pdf_path, data, directory):
         """使用PyMuPDF添加注释"""
         # 使用PyMuPDF打开PDF
-        doc = fitz.open(temp_pdf_path)
+        doc = pymupdf.open(temp_pdf_path)
         
         pages = data.get("pages", {})
         image_names = list(pages.keys())
@@ -215,7 +215,7 @@ class JsonToPdfConverter:
             
             # 添加注释
             for block in text_blocks:
-                text = block.get("text", "")
+                text = block.get("translation", "")
                 if isinstance(text, list):
                     text = " ".join(text)  # 将列表转换为字符串
                 
@@ -244,7 +244,7 @@ class JsonToPdfConverter:
                 annotation_subject = f"字体: {font_name}}}{{字号: {converted_font_size}"
                 
                 # 创建注释矩形（在文本块位置添加注释图标）
-                rect = fitz.Rect(abs_x, abs_y, abs_x + 20, abs_y + 20)
+                rect = pymupdf.Rect(abs_x, abs_y, abs_x + 20, abs_y + 20)
                 
                 # 添加文本注释
                 if 0 <= abs_x <= page.rect.width and 0 <= abs_y <= page.rect.height:
