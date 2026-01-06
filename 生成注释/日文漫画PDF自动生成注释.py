@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from PDF_auto_annot import add_annotations_to_pdf
-version = "250606"
+version = "260106"
 
 def run():
     pdf_paths = filedialog.askopenfilenames(
@@ -13,7 +13,8 @@ def run():
     x_threshold = x_var.get()
     y_threshold = y_var.get()
     include_font_info = fontinfo_var.get()
-    filter_color = filter_color_var.get()  # 新增
+    filter_color = filter_color_var.get()  # 获取过滤颜色选项
+    filter_adv = filter_adv_var.get()  # 获取过滤水平文字选项
     try:
         add_annotations_to_pdf(
             pdf_paths, 
@@ -22,7 +23,8 @@ def run():
             y_threshold, 
             include_font_info,
             font_scale_var,  #字号放大
-            filter_color,    # 新增参数
+            filter_color,    # 过滤颜色
+            filter_adv,  #过滤水平文字
         )
         messagebox.showinfo("完成", "批量处理完成！")
     except Exception as e:
@@ -51,6 +53,9 @@ rubi_size_scale.grid(row=0, column=1)
 # 新增过滤标签颜色勾选框
 filter_color_var = tk.BooleanVar(value=True)
 tk.Checkbutton(root, text="过滤标签颜色", variable=filter_color_var).grid(row=0, column=2, sticky='w')
+# 新增过滤水平文字勾选框
+filter_adv_var = tk.BooleanVar(value=False)
+tk.Checkbutton(root, text="过滤水平文字", variable=filter_adv_var).grid(row=2, column=2, sticky='w')
 
 tk.Label(root, text="竖向行距倍数：").grid(row=1, column=0)
 x_var = tk.DoubleVar(value=1.92)

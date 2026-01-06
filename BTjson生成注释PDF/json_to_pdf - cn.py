@@ -241,7 +241,7 @@ class JsonToPdfConverter:
                 
                 # 创建注释内容
                 annotation_content = f"{text}"
-                annotation_subject = f"字体: {font_name}}}{{字号: {converted_font_size}"
+                annotation_subject = f"字体：{font_name}}}{{字号：{converted_font_size}"
                 
                 # 创建注释矩形（在文本块位置添加注释图标）
                 rect = pymupdf.Rect(abs_x, abs_y, abs_x + 20, abs_y + 20)

@@ -101,11 +101,15 @@ def get_block_fontname(block_chars, first_char):
         return fontname.split('+', 1)[-1]
     return fontname
 
-def should_filter_by_tag(char, filter_color):
+def should_filter_by_tag(char, filter_color, filter_adv):
     tag = char.get('tag', None)
+    if filter_adv:
+        adv = char.get('adv', None)
+        if adv > 0:
+            return True
     if tag == 'PlacedPDF':
         return False
-    if tag == 'Metadata' or tag == 'OC':
+    if tag == 'Metadata':
         return True
     if tag is None:
         color = char.get('non_stroking_color', None)
@@ -130,7 +134,8 @@ def add_annotations_to_pdf(
     y_position_threshold, 
     include_font_info,
     font_scale, 
-    filter_color,  # 新增参数
+    filter_color,   #过滤颜色
+    filter_adv, #过滤水平文字
 ):
     """
     批量处理PDF文件，在每个文字块右上角添加注释。
@@ -154,7 +159,7 @@ def add_annotations_to_pdf(
                     # 过滤假名
                     rubyfliter = not should_filter_kana(char, prev_char, rubi_size)
                     # tag过滤
-                    if should_filter_by_tag(char, filter_color):
+                    if should_filter_by_tag(char, filter_color, filter_adv):
                         rubyfliter = False
                     if rubyfliter:
                         if prev_char is not None and is_new_block(prev_char, char, x_position_threshold, y_position_threshold):
