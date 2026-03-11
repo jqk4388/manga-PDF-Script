@@ -1,0 +1,8 @@
+flask
+pdfplumber
+pymupdf
+requests
+pandas
+openpyxl
+pypdf
+pillow

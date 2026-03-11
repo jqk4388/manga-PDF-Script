@@ -4,3 +4,11 @@ dist/*.*
 dist/*/*.*
 __pycache__/*.*
 dist/*/*/*
+*.xlsx
+*.csv
+__pycache__
+translation_cache
+output
+checkpoints
+漫画
+*.pdf
