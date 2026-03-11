@@ -1,7 +1,4 @@
 # Manga PDF Translator 使用指南
-
-## 概述
-
 日本漫画PDF自动翻译系统，可从漫画PDF中提取日文文本，调用大模型API进行翻译，生成带注释的PDF和LabelPlus格式的txt文稿。
 
 ## 使用前配置
