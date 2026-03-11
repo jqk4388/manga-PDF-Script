@@ -16,7 +16,7 @@ API_PROVIDERS = {
         "name": "Ollama (本地)",
         "api_base_url": "http://localhost:11434",
         "api_key": "ollama",
-        "model": "huihui_ai/qwen3.5-abliterated:0.8B",
+        "model": "huihui_ai/qwen3.5-abliterated:9B",
         "max_tokens": 1024,
         "temperature": 0.7,
         "enabled": True,

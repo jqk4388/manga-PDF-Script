@@ -325,6 +325,9 @@ class TranslationAPI:
             "messages": [{"role": "user", "content": prompt}],
             "stream": False,
             "think": False,
+            "options": {
+                "temperature": 0.7,
+            },
         }
         url = f"{self.api_base_url}/api/chat"
         _debug.log_api_request(self.provider_name, self.model, url, prompt, headers)
@@ -430,7 +433,57 @@ def extract_translation_from_tag(response_text):
         list_extracted = extract_translation_from_list_format(extracted)
         if list_extracted:
             return list_extracted
+        
+        # 尝试去除简单的数字序号格式（如 "1."、"2." 等）
+        simple_number_extracted = extract_simple_number_format(extracted)
+        if simple_number_extracted:
+            return simple_number_extracted
+        
         return extracted
+    
+    return None
+
+
+def extract_simple_number_format(response_text):
+    """从简单的数字序号格式中提取译文（如 '1.文本' 格式）"""
+    if not response_text:
+        return None
+    
+    lines = response_text.strip().split('\n')
+    if not lines:
+        return None
+    
+    # 检查是否所有行都以数字序号开头
+    number_pattern = re.compile(r'^(\d+)\s*[\.、。\:：]\s*(.*)$')
+    
+    extracted_lines = []
+    all_match = True
+    last_number = 0
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        
+        match = number_pattern.match(line)
+        if match:
+            num = int(match.group(1))
+            text = match.group(2).strip()
+            
+            # 检查序号是否连续（允许从1开始或从0开始）
+            if last_number == 0 or num == last_number + 1:
+                extracted_lines.append(text)
+                last_number = num
+            else:
+                all_match = False
+                break
+        else:
+            all_match = False
+            break
+    
+    # 只有当至少有2行匹配且序号连续时才认为格式正确
+    if all_match and len(extracted_lines) >= 1 and last_number >= 1:
+        return '\n'.join(extracted_lines)
     
     return None
 

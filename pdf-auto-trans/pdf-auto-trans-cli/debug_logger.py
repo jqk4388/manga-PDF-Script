@@ -128,8 +128,11 @@ class DebugLogger:
     def log_error(self, stage, error_msg):
         self.logger.error(f"错误 [{stage}]: {error_msg}")
     
-    def log_warning(self, stage, warning_msg):
-        self.logger.warning(f"警告 [{stage}]: {warning_msg}")
+    def log_warning(self, stage, warning_msg=None):
+        if warning_msg is None:
+            self.logger.warning(f"{stage}")
+        else:
+            self.logger.warning(f"警告 [{stage}]: {warning_msg}")
     
     def log_info(self, message):
         self.logger.info(message)

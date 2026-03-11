@@ -18,7 +18,7 @@ API_PROVIDERS = {
         "name": "Ollama (本地)",
         "api_base_url": "http://localhost:11434",
         "api_key": "ollama",
-        "model": "huihui_ai/qwen3.5-abliterated:0.8B",
+        "model": "huihui_ai/qwen3.5-abliterated:9B",
         "enabled": True,
     },
     "deepseek": {
@@ -91,7 +91,7 @@ A: 系统会自动重试5次，若所有供应商都失败会使用原文。检�
 
 ### Q: 如何使用本地Ollama
 1. 安装Ollama：https://ollama.ai
-2. 下载模型：`ollama pull huihui_ai/qwen3.5-abliterated:0.8B`
+2. 下载模型：`ollama pull huihui_ai/qwen3.5-abliterated:9B`
 3. 启动Ollama服务后启用配置
 
 ## 输出文件
