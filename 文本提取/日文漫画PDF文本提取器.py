@@ -30,7 +30,9 @@ def extract_worker(pdf_list):
         password = password_var.get()  # 获取密码值
         extracted_PDF_JPtext.main(jiyingshe_info, export_lptxt_var, export_blank_lptxt_var, 
                                 pagekuaye, path, text_size_var, x_offset_var, y_offset_var, 
-                                password=password)  # 传递密码参数
+                                password=password,
+                                enable_special_char_replace=special_char_replace_var.get(),
+                                include_font_info=include_font_info_var.get())
 
 def extract_pdf():
     if file_paths:
@@ -93,9 +95,9 @@ root.geometry(f"+{x}+{y}")
 
 # 添加密码输入框
 password_var = tk.StringVar(value="")
-tk.Label(root, text="PDF密码(无密码留空):").grid(row=5, column=0, sticky='w')
+tk.Label(root, text="PDF密码(无密码留空):").grid(row=6, column=0, sticky='w')
 password_entry = tk.Entry(root, textvariable=password_var, show="*")
-password_entry.grid(row=5, column=1, sticky="ew")
+password_entry.grid(row=6, column=1, sticky="ew")
 
 # 定义一个变量来保存page的值
 pagekuaye = tk.IntVar(value=2)
@@ -152,6 +154,10 @@ y_offset_entry.bind("<Return>", lambda event: update_y_offset_slider(y_offset_va
 
 # 定义一个保存“是否导出lptxt”勾选状态的变量
 export_lptxt_var = tk.IntVar(value=1)
+# 定义一个保存“是否启用特殊字符替换”勾选状态的变量
+special_char_replace_var = tk.BooleanVar(value=1)
+# 定义一个保存“是否在lptxt中带字体字号信息”勾选状态的变量
+include_font_info_var = tk.BooleanVar(value=0)
 
 # 创建一个勾选框
 checkbox = tk.Checkbutton(root, text="是否跨页", variable=checkbox_var, command=update_page)
@@ -160,16 +166,33 @@ checkbox.grid(row=4, column=0)
 # 创建“是否导出lptxt”勾选框
 export_lptxt_checkbox = tk.Checkbutton(root, text="导出lptxt", variable=export_lptxt_var)
 export_lptxt_checkbox.grid(row=4, column=1, sticky='w')
+
+# 创建“是否启用特殊字符替换”勾选框
+special_char_replace_checkbox = tk.Checkbutton(root, text="开启特殊字符替换", variable=special_char_replace_var)
+special_char_replace_checkbox.grid(row=2, column=3, sticky='w')
+
+# 创建“带字体字号信息”勾选框，默认禁用，必须在导出lptxt时才启用
+include_font_info_checkbox = tk.Checkbutton(root, text="带字体字号信息", variable=include_font_info_var)
+include_font_info_checkbox.grid(row=5, column=1, sticky='w')
+include_font_info_checkbox.config(state=tk.DISABLED)
 # 定义一个保存“是否导出空白lptxt”勾选状态的变量
 export_blank_lptxt_var = tk.IntVar(value=0)
 
 def on_export_lptxt_change():
     if export_lptxt_var.get():
         export_blank_lptxt_var.set(0)
+        include_font_info_checkbox.config(state=tk.NORMAL)
+    else:
+        include_font_info_checkbox.config(state=tk.DISABLED)
+        include_font_info_var.set(0)
 
 def on_export_blank_lptxt_change():
     if export_blank_lptxt_var.get():
         export_lptxt_var.set(0)
+        include_font_info_checkbox.config(state=tk.DISABLED)
+        include_font_info_var.set(0)
+    else:
+        include_font_info_checkbox.config(state=tk.NORMAL if export_lptxt_var.get() else tk.DISABLED)
 
 def on_jiyingshe_change(*args):
     state = tk.DISABLED if jiyingshe_var.get() else tk.NORMAL
@@ -182,6 +205,7 @@ on_jiyingshe_change()
 
 # 更新“导出lptxt”勾选框的回调
 export_lptxt_checkbox.config(command=on_export_lptxt_change)
+on_export_lptxt_change()
 
 # 创建“导出空白lptxt”勾选框
 export_blank_lptxt_checkbox = tk.Checkbutton(root, text="仅导出坐标", variable=export_blank_lptxt_var, command=on_export_blank_lptxt_change)
