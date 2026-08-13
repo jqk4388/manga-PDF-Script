@@ -168,7 +168,7 @@ export_lptxt_checkbox = tk.Checkbutton(root, text="导出lptxt", variable=export
 export_lptxt_checkbox.grid(row=4, column=1, sticky='w')
 
 # 创建“是否启用特殊字符替换”勾选框
-special_char_replace_checkbox = tk.Checkbutton(root, text="开启特殊字符替换", variable=special_char_replace_var)
+special_char_replace_checkbox = tk.Checkbutton(root, text="日文特殊符号恢复", variable=special_char_replace_var)
 special_char_replace_checkbox.grid(row=2, column=3, sticky='w')
 
 # 创建“带字体字号信息”勾选框，默认禁用，必须在导出lptxt时才启用

@@ -35,7 +35,7 @@ def get_block_font_info(block_chars, first_char):
     """返回字体和字号信息"""
     fontname = get_block_fontname(block_chars, first_char)
     size_pt = float(first_char["size"]) * 0.708661
-    return f"{{字体：{fontname}，字号：{size_pt:.1f}}}"
+    return f"{{字体：{fontname}}}{{字号：{size_pt:.1f}}}"
 
 
 def handle_pdf_password_exception(e, file_path):
